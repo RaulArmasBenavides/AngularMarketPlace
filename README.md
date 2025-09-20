@@ -32,3 +32,4 @@ To get more help on the Angular CLI use `ng help` or go check out the [Angular C
 Preview Demo 
 ![image](https://github.com/user-attachments/assets/29197d9c-595e-43b2-9da8-930c798cc88f)
 
+nvm use 12.22.12
