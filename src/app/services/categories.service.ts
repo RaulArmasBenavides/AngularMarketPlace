@@ -7,9 +7,9 @@ import { Api } from '../config';
 })
 export class CategoriesService {
 
-  private api:String = Api.url;
+  private readonly api:String = Api.url;
 
-  constructor(private http: HttpClient) { }
+  constructor(private readonly http: HttpClient) { }
 
   getData(){
 

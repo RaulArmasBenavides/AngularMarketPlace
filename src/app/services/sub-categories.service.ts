@@ -7,9 +7,9 @@ import { Api } from '../config';
 })
 export class SubCategoriesService {
 
-  private api:String = Api.url;
+  private readonly api:String = Api.url;
 
-  constructor(private http: HttpClient) { }
+  constructor(private readonly http: HttpClient) { }
   getFilterData(orderBy, equalTo){
 
    return this.http.get(`${this.api}sub-categories.json?orderBy="${orderBy}"&equalTo="${equalTo}"&print=pretty`);
