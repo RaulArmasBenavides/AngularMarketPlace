@@ -19,7 +19,7 @@ export class HeaderComponent implements OnInit {
   categories:Object = null;
     arrayTitleList:Array<any> = [];
     render:Boolean = true;
-  constructor(private categoriesService: CategoriesService, private subCategoriesService: SubCategoriesService) { }
+  constructor(private readonly categoriesService: CategoriesService, private readonly subCategoriesService: SubCategoriesService) { }
 
   ngOnInit(): void {
 
