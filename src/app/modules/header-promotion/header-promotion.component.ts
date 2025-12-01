@@ -14,7 +14,7 @@ export class HeaderPromotionComponent implements OnInit {
   top_banner:Object = null;
   preload:Boolean = false;
 
-  constructor(private productsService: ProductsService ) { }
+  constructor(private readonly productsService: ProductsService ) { }
 
   ngOnInit(): void {
 
