@@ -15,12 +15,12 @@ import { SubCategoriesService } from '../../services/sub-categories.service';
 })
 export class FooterComponent implements OnInit {
 
-  path: String = Path.url;
+  path: string = Path.url;
   categories:Object = null;
-	render:Boolean = true;
+	render:boolean = true;
 	categoriesList: Array<any> = [];
 
-  constructor(private categoriesService: CategoriesService, private subCategoriesService: SubCategoriesService) { }
+  constructor(private readonly categoriesService: CategoriesService, private readonly subCategoriesService: SubCategoriesService) { }
 
   ngOnInit(): void {
 
