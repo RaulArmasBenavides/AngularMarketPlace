@@ -9,9 +9,10 @@ import { CategoriesService } from '../../services/categories.service';
 import { SubCategoriesService } from '../../services/sub-categories.service';
 
 @Component({
-	selector: 'app-header-mobile',
-	templateUrl: './header-mobile.component.html',
-	styleUrls: ['./header-mobile.component.css']
+    selector: 'app-header-mobile',
+    templateUrl: './header-mobile.component.html',
+    styleUrls: ['./header-mobile.component.css'],
+    standalone: false
 })
 export class HeaderMobileComponent implements OnInit {
 	path: string = Path.url;

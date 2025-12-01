@@ -4,9 +4,10 @@ import { Path } from '../../config';
 import { ProductsService } from '../../services/products.service';
 
 @Component({
-  selector: 'app-header-promotion',
-  templateUrl: './header-promotion.component.html',
-  styleUrls: ['./header-promotion.component.css']
+    selector: 'app-header-promotion',
+    templateUrl: './header-promotion.component.html',
+    styleUrls: ['./header-promotion.component.css'],
+    standalone: false
 })
 export class HeaderPromotionComponent implements OnInit {
 
