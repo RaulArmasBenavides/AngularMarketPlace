@@ -1,14 +1,15 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { environment } from 'src/environments/environment';
 
-import { Api } from '../config';
+
 
 @Injectable({
   providedIn: 'root'
 })
 export class ProductsService {
 
-  private readonly api: String = Api.url;
+  private readonly api: string = environment.marketPlaceUrl;
 
   constructor(private readonly http: HttpClient) { }
 

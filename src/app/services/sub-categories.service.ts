@@ -1,18 +1,15 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Api } from '../config';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
-  providedIn: 'root'
+	providedIn: 'root'
 })
 export class SubCategoriesService {
+	private readonly api: string = environment.marketPlaceUrl;
 
-  private readonly api:String = Api.url;
-
-  constructor(private readonly http: HttpClient) { }
-  getFilterData(orderBy, equalTo){
-
-   return this.http.get(`${this.api}sub-categories.json?orderBy="${orderBy}"&equalTo="${equalTo}"&print=pretty`);
-
-  }
+	constructor(private readonly http: HttpClient) {}
+	getFilterData(orderBy: any, equalTo: any) {
+		return this.http.get(`${this.api}sub-categories.json?orderBy="${orderBy}"&equalTo="${equalTo}"&print=pretty`);
+	}
 }
