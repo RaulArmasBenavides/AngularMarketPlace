@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-
-import { Path } from '../../config';
+import { environment } from 'src/environments/environment';
 import { ProductsService } from '../../services/products.service';
 
 @Component({
@@ -11,8 +10,8 @@ import { ProductsService } from '../../services/products.service';
 })
 export class HeaderPromotionComponent implements OnInit {
 
-  path: string = Path.url;
-  top_banner:Object = null;
+  path: string = environment.assets;
+  top_banner:Object = new Object;
   preload:boolean = false;
 
   constructor(private readonly productsService: ProductsService ) { }
@@ -22,8 +21,8 @@ export class HeaderPromotionComponent implements OnInit {
     this.preload = true;
 
 		this.productsService.getData()
-		.subscribe(resp =>{
-			
+		.subscribe((resp:any) =>{
+
 			// console.log("resp", resp[Object.keys(resp)[1]]);
 
 			/*=============================================
@@ -35,12 +34,12 @@ export class HeaderPromotionComponent implements OnInit {
 
 			for(i in resp){
 
-				size++			
+				size++
 
 			}
 
 			/*=============================================
-			Generar un número aleatorio 
+			Generar un número aleatorio
 			=============================================*/
 
 			let index = Math.floor(Math.random()*size);
@@ -50,9 +49,9 @@ export class HeaderPromotionComponent implements OnInit {
 			=============================================*/
 
 			this.top_banner = JSON.parse(resp[Object.keys(resp)[index]].top_banner);
-			
+
 			this.preload = false;
-		
+
 
 		})
   }

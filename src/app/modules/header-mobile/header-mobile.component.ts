@@ -1,22 +1,21 @@
 import { Component, OnInit } from '@angular/core';
 
-import { Path } from '../../config';
-
 declare var jQuery: any;
 declare var $: any;
 
 import { CategoriesService } from '../../services/categories.service';
 import { SubCategoriesService } from '../../services/sub-categories.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
-    selector: 'app-header-mobile',
-    templateUrl: './header-mobile.component.html',
-    styleUrls: ['./header-mobile.component.css'],
-    standalone: false
+	selector: 'app-header-mobile',
+	templateUrl: './header-mobile.component.html',
+	styleUrls: ['./header-mobile.component.css'],
+	standalone: false
 })
 export class HeaderMobileComponent implements OnInit {
-	path: string = Path.url;
-	categories: Object = null;
+	path: string = environment.assets;
+	categories: Object = new Object();
 	render: boolean = true;
 	categoriesList: Array<any> = [];
 
@@ -29,7 +28,7 @@ export class HeaderMobileComponent implements OnInit {
 		/*=============================================
 		Tomamos la data de las categorías
     =============================================*/
-		this.categoriesService.getData().subscribe((resp) => {
+		this.categoriesService.getData().subscribe((resp:any) => {
 			this.categories = resp;
 
 			/*=============================================
@@ -51,7 +50,7 @@ export class HeaderMobileComponent implements OnInit {
 		=============================================*/
 
 		$(document).on('click', '.sub-toggle', function () {
-			$(this).parent().children('ul').toggle();
+			// $(this).parent().children('ul').toggle();
 		});
 	}
 	/*=============================================
@@ -72,7 +71,7 @@ export class HeaderMobileComponent implements OnInit {
 				Tomamos la colección de las sub-categorías filtrando con los nombres de categoría
 				=============================================*/
 
-				this.subCategoriesService.getFilterData('category', category).subscribe((resp) => {
+				this.subCategoriesService.getFilterData('category', category).subscribe((resp: any) => {
 					/*=============================================
 					Hacemos un recorrido por la colección general de subcategorias y clasificamos las subcategorias y url
 					de acuerdo a la categoría que correspondan
