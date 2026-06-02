@@ -1,124 +1,51 @@
-import { Component, OnInit } from '@angular/core';
-
-import { CategoriesService } from '../../services/categories.service';
-import { SubCategoriesService } from '../../services/sub-categories.service';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
-
-declare var jQuery: any;
-declare var $: any;
+import { CategoryHierarchyService, CategoryWithSubcategories, SubCategoryItem } from '../../services/category-hierarchy.service';
 
 @Component({
 	selector: 'app-header',
 	templateUrl: './header.component.html',
 	styleUrls: ['./header.component.css'],
-	standalone: false
+	standalone: false,
+	changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class HeaderComponent implements OnInit {
+export class HeaderComponent implements OnInit, OnDestroy {
 	path: string = environment.assets;
-	categories: Object = new Object;
-	arrayTitleList: Array<any> = [];
-	render: boolean = true;
+	categoriesWithSubcategories: CategoryWithSubcategories[] = [];
+	private destroy$ = new Subject<void>();
+
 	constructor(
-		private readonly categoriesService: CategoriesService,
-		private readonly subCategoriesService: SubCategoriesService
+		private readonly categoryHierarchyService: CategoryHierarchyService
 	) {}
 
 	ngOnInit(): void {
-		/*=============================================
-	    Tomamos la data de las categorías
-		=============================================*/
-
-		this.categoriesService.getData().subscribe((resp:any) => {
-			this.categories = resp;
-
-			/*=============================================
-			Recorremos la colección de categorías para tomar la lista de títulos
-			=============================================*/
-
-			let i;
-
-			for (i in resp) {
-				/*=============================================
-				Separamos la lista de títulos en índices de un array
-				=============================================*/
-
-				this.arrayTitleList.push(JSON.parse(resp[i].title_list));
-			}
-		});
+		this.loadCategoriesWithSubcategories();
 	}
 
-	/*=============================================
-	Función que nos avisa cuando finaliza el renderizado de Angular
-	=============================================*/
+	ngOnDestroy(): void {
+		this.destroy$.next();
+		this.destroy$.complete();
+	}
 
-	callback() {
-		if (this.render) {
-			this.render = false;
-			let arraySubCategories = [];
-
-			/*=============================================
-			Hacemos un recorrido por la lista de títulos
-			=============================================*/
-
-			this.arrayTitleList.forEach((titleList) => {
-				/*=============================================
-				Separar individualmente los títulos
-				=============================================*/
-
-				for (let i = 0; i < titleList.length; i++) {
-					/*=============================================
-					Tomamos la colección de las sub-categorías filtrando con la lista de títulos
-					=============================================*/
-
-					this.subCategoriesService.getFilterData('title_list', titleList[i]).subscribe((resp:any) => {
-						arraySubCategories.push(resp);
-
-						/*=============================================
-						Hacemos un recorrido por la colección general de subcategorias
-						=============================================*/
-
-						let f;
-						let g;
-						let arrayTitleName = [];
-
-						for (f in arraySubCategories) {
-							/*=============================================
-							Hacemos un recorrido por la colección particular de subcategorias
-							=============================================*/
-
-							for (g in arraySubCategories[f]) {
-								/*=============================================
-								Creamos un nuevo array de objetos clasificando cada subcategoría con la respectiva lista de título a la que pertenece
-								=============================================*/
-
-								arrayTitleName.push({
-									titleList: arraySubCategories[f][g].title_list,
-									subcategory: arraySubCategories[f][g].name,
-									url: arraySubCategories[f][g].url
-								});
-							}
-						}
-
-						/*=============================================
-						Recorremos el array de objetos nuevo para buscar coincidencias con las listas de título
-						=============================================*/
-
-						for (f in arrayTitleName) {
-							if (titleList[i] == arrayTitleName[f].titleList) {
-								/*=============================================
-								Imprimir el nombre de subcategoría debajo de el listado correspondiente
-								=============================================*/
-
-								$(`[titleList='${titleList[i]}']`).append(
-									`<li>
-										<a href="products/${arrayTitleName[f].url}">${arrayTitleName[f].subcategory}</a>
-									</li>`
-								);
-							}
-						}
-					});
+	private loadCategoriesWithSubcategories(): void {
+		this.categoryHierarchyService
+			.getCategoriesWithSubcategories()
+			.pipe(takeUntil(this.destroy$))
+			.subscribe({
+				next: (data) => {
+					this.categoriesWithSubcategories = data;
+				},
+				error: (err) => {
+					console.error('Error loading categories:', err);
 				}
 			});
-		}
+	}
+
+	getSubcategoriesByTitle(titleList: string): SubCategoryItem[] {
+		return this.categoriesWithSubcategories
+			.flatMap((cat) => cat.subcategories)
+			.filter((sub) => sub.titleList === titleList);
 	}
 }

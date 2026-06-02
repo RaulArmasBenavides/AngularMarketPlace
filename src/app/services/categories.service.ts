@@ -1,6 +1,9 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
+import { Category } from '../models/category.model';
 
 @Injectable({
 	providedIn: 'root'
@@ -10,7 +13,20 @@ export class CategoriesService {
 
 	constructor(private readonly http: HttpClient) {}
 
-	getData() {
-		return this.http.get(`${this.api}categories.json`);
+	getData(): Observable<Category[]> {
+		return this.http.get<Category[]>(`${this.api}categories.json`).pipe(
+			catchError(this.handleError)
+		);
+	}
+
+	private handleError(error: HttpErrorResponse): Observable<never> {
+		let errorMessage = 'An error occurred while fetching categories';
+		if (error.error instanceof ErrorEvent) {
+			errorMessage = error.error.message;
+		} else {
+			errorMessage = `Error Code: ${error.status}\nMessage: ${error.message}`;
+		}
+		console.error(errorMessage);
+		return throwError(() => new Error(errorMessage));
 	}
 }

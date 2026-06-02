@@ -1,21 +1,32 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
-
-
+import { Product } from '../models/product.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ProductsService {
-
   private readonly api: string = environment.marketPlaceUrl;
 
-  constructor(private readonly http: HttpClient) { }
+  constructor(private readonly http: HttpClient) {}
 
-  getData(){
+  getData(): Observable<Product[]> {
+    return this.http.get<Product[]>(`${this.api}products.json`).pipe(
+      catchError(this.handleError)
+    );
+  }
 
-   return this.http.get(`${this.api}products.json`);
-
-	}
+  private handleError(error: HttpErrorResponse): Observable<never> {
+    let errorMessage = 'An error occurred while fetching products';
+    if (error.error instanceof ErrorEvent) {
+      errorMessage = error.error.message;
+    } else {
+      errorMessage = `Error Code: ${error.status}\nMessage: ${error.message}`;
+    }
+    console.error(errorMessage);
+    return throwError(() => new Error(errorMessage));
+  }
 }

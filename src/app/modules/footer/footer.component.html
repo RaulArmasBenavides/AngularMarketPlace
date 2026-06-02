@@ -111,12 +111,12 @@
 
         <div class="ps-footer__links">
 
-            <p *ngFor="let category of categories; let lastIndex = last">
-                <strong [attr.category-footer]="category.name">{{category.name}}</strong> {{ lastIndex ? callback() : ""}}
-
+            <p *ngFor="let categoryItem of footerCategories">
+                <strong>{{categoryItem.category}}</strong>
+                <a *ngFor="let subcategory of categoryItem.subcategories" href="products/{{subcategory.url}}" class="ps-footer__link">
+                    {{subcategory.subcategory}}
+                </a>
             </p>
-
-
 
         </div>
 

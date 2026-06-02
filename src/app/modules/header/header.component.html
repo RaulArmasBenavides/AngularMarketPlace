@@ -83,21 +83,26 @@
 
 					<div class="menu__content">
 						<ul class="menu--dropdown">
-							<li *ngFor="let category of categories; let i = index; let lastIndex = last" class="menu-item-has-children has-mega-menu">
-								<a routerLink="products/{{category.url}}"> <i class="{{category.icon}}"></i> {{category.name}} </a>
+							<li *ngFor="let categoryItem of categoriesWithSubcategories" class="menu-item-has-children has-mega-menu">
+								<a routerLink="products/{{categoryItem.category.url}}">
+									<i class="{{categoryItem.category.icon}}"></i>
+									{{categoryItem.category.name}}
+								</a>
 
-								<div class="mega-menu">
-									<div *ngFor="let title of arrayTitleList[i]" class="mega-menu__column">
+								<div class="mega-menu" *ngIf="categoryItem.titleList.length > 0">
+									<div *ngFor="let title of categoryItem.titleList" class="mega-menu__column">
 										<h4>
 											{{title}}
 											<span class="sub-toggle"></span>
 										</h4>
 
-										<ul class="mega-menu__list" [attr.titleList]="title"></ul>
+										<ul class="mega-menu__list">
+											<li *ngFor="let subcategory of getSubcategoriesByTitle(title)">
+												<a routerLink="products/{{subcategory.url}}">{{subcategory.subcategory}}</a>
+											</li>
+										</ul>
 									</div>
 								</div>
-
-								{{ lastIndex ? callback() : "" }}
 							</li>
 						</ul>
 					</div>

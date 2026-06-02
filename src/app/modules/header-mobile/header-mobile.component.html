@@ -74,19 +74,19 @@
 
                             <ul class="ps-list--categories">
 
-                                <li *ngFor="let category of categories; let lastIndex = last" class="current-menu-item menu-item-has-children">
+                                <li *ngFor="let category of categories" class="current-menu-item menu-item-has-children">
 
                                     <a routerLink="products/{{category.url}}"><strong>{{category.name}}</strong></a>
 
-                                    <span class="sub-toggle">
-					                		<i class="fa fa-angle-down"></i>
-					                	</span>
+                                    <span class="sub-toggle" *ngIf="category.subcategories.length > 0">
+						                		<i class="fa fa-angle-down"></i>
+						                	</span>
 
-                                    <ul class="sub-menu" [attr.category]="category.name">
-
+                                    <ul class="sub-menu" *ngIf="category.subcategories.length > 0">
+                                        <li *ngFor="let subcategory of category.subcategories" class="current-menu-item">
+                                            <a routerLink="products/{{subcategory.url}}">{{subcategory.name}}</a>
+                                        </li>
                                     </ul>
-
-                                    {{ lastIndex ? callback() : "" }}
 
                                 </li>
 
@@ -112,8 +112,8 @@
             <div class="header__actions">
 
                 <!--=====================================
-					Cart
-					======================================-->
+						Cart
+						======================================-->
 
                 <div class="ps-cart--mini">
 
@@ -185,8 +185,8 @@
                 </div>
 
                 <!--=====================================
-					Login and Register
-					======================================-->
+						Login and Register
+						======================================-->
 
                 <div class="ps-block--user-header">
 

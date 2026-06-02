@@ -1,95 +1,55 @@
-import { Component, OnInit } from '@angular/core';
-declare var $: any;
-
-import { CategoriesService } from '../../services/categories.service';
-import { SubCategoriesService } from '../../services/sub-categories.service';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
+import { CategoryHierarchyService } from '../../services/category-hierarchy.service';
+
+export interface CategoryWithSubcategories {
+	category: string;
+	subcategories: Array<{
+		titleList: string;
+		subcategory: string;
+		url: string;
+		category?: string;
+	}>;
+}
 
 @Component({
 	selector: 'app-footer',
 	templateUrl: './footer.component.html',
 	styleUrls: ['./footer.component.css'],
-	standalone: false
+	standalone: false,
+	changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class FooterComponent implements OnInit {
+export class FooterComponent implements OnInit, OnDestroy {
 	path: string = environment.assets;
-	categories: Object = new Object();
-	render: boolean = true;
-	categoriesList: Array<any> = [];
+	footerCategories: CategoryWithSubcategories[] = [];
+	private destroy$ = new Subject<void>();
 
 	constructor(
-		private readonly categoriesService: CategoriesService,
-		private readonly subCategoriesService: SubCategoriesService
+		private readonly categoryHierarchyService: CategoryHierarchyService
 	) {}
 
 	ngOnInit(): void {
-		/*=============================================
-		Tomamos la data de las categorías
-		=============================================*/
-
-		this.categoriesService.getData().subscribe((resp: any) => {
-			this.categories = resp;
-
-			let i;
-
-			for (i in resp) {
-				/*=============================================
-				Separamos los nombres de categorías
-				=============================================*/
-
-				this.categoriesList.push(resp[i].name);
-			}
-		});
+		this.loadFooterCategories();
 	}
 
-	/*=============================================
-	Función que nos avisa cuando finaliza el renderizado de Angular
-	=============================================*/
+	ngOnDestroy(): void {
+		this.destroy$.next();
+		this.destroy$.complete();
+	}
 
-	callback() {
-		if (this.render) {
-			this.render = false;
-
-			let arraySubCategories = [];
-
-			/*=============================================
-			Separar las categorías
-			=============================================*/
-
-			this.categoriesList.forEach((category) => {
-				/*=============================================
-				Tomamos la colección de las sub-categorías filtrando con los nombres de categoría
-				=============================================*/
-
-				this.subCategoriesService.getFilterData('category', category).subscribe((resp: any) => {
-					/*=============================================
-					Hacemos un recorrido por la colección general de subcategorias y clasificamos las subcategorias y url
-					de acuerdo a la categoría que correspondan
-					=============================================*/
-
-					let i;
-
-					for (i in resp) {
-						arraySubCategories.push({
-							category: resp[i].category,
-							subcategory: resp[i].name,
-							url: resp[i].url
-						});
-					}
-
-					/*=============================================
-					Recorremos el array de objetos nuevo para buscar coincidencias con los nombres de categorías
-					=============================================*/
-
-					for (i in arraySubCategories) {
-						if (category == arraySubCategories[i].category) {
-							$(`[category-footer='${category}']`).after(
-								`<a href="products/${arraySubCategories[i].url}">${arraySubCategories[i].subcategory}</a>`
-							);
-						}
-					}
-				});
+	private loadFooterCategories(): void {
+		this.categoryHierarchyService
+			.getFooterCategories()
+			.pipe(takeUntil(this.destroy$))
+			.subscribe({
+				next: (data) => {
+					this.footerCategories = data;
+				},
+				error: (err) => {
+					console.error('Error loading footer categories:', err);
+				}
 			});
-		}
 	}
 }
