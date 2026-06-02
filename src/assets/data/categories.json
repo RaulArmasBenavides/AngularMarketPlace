@@ -1,0 +1,32 @@
+[
+  {
+    "id": 1,
+    "name": "Electronics",
+    "parentId": null,
+    "title_list": "[\"Computers\", \"Accessories\", \"Audio\"]"
+  },
+  {
+    "id": 2,
+    "name": "Office",
+    "parentId": null,
+    "title_list": "[\"Furniture\", \"Supplies\", \"Lighting\"]"
+  },
+  {
+    "id": 3,
+    "name": "Software",
+    "parentId": null,
+    "title_list": "[\"Development\", \"Design\", \"Productivity\"]"
+  },
+  {
+    "id": 4,
+    "name": "Books",
+    "parentId": null,
+    "title_list": "[\"Programming\", \"Business\", \"Fiction\"]"
+  },
+  {
+    "id": 5,
+    "name": "Services",
+    "parentId": null,
+    "title_list": "[\"Consulting\", \"Support\", \"Training\"]"
+  }
+]

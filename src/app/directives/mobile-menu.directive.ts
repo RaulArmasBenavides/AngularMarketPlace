@@ -65,8 +65,8 @@ export class MobileMenuDirective implements OnInit {
         toggle.classList.toggle('active');
         submenu?.classList.toggle('open');
 
-        parent.querySelectorAll('.sub-menu').forEach((el: HTMLElement) => {
-          if (el !== submenu) el.classList.remove('open');
+        parent.querySelectorAll('.sub-menu').forEach((el: Element) => {
+          if (el !== submenu) (el as HTMLElement).classList.remove('open');
         });
       });
     });

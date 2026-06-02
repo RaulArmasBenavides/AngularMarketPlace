@@ -1,0 +1,74 @@
+[
+  {
+    "id": 1,
+    "name": "Laptop Dell XPS 13",
+    "title": "Premium Laptop for Developers",
+    "price": 1299,
+    "category": "Electronics",
+    "image": "https://via.placeholder.com/300x300?text=Laptop",
+    "description": "Ultra-portable laptop with 13-inch display and powerful processor"
+  },
+  {
+    "id": 2,
+    "name": "Wireless Mouse",
+    "title": "Logitech MX Master 3",
+    "price": 99,
+    "category": "Electronics",
+    "image": "https://via.placeholder.com/300x300?text=Mouse",
+    "description": "Advanced wireless mouse with precision scrolling"
+  },
+  {
+    "id": 3,
+    "name": "USB-C Hub",
+    "title": "7-in-1 USB-C Hub",
+    "price": 49,
+    "category": "Electronics",
+    "image": "https://via.placeholder.com/300x300?text=Hub",
+    "description": "Multi-port USB-C hub for connectivity"
+  },
+  {
+    "id": 4,
+    "name": "Mechanical Keyboard",
+    "title": "Cherry MX Mechanical Keyboard",
+    "price": 159,
+    "category": "Electronics",
+    "image": "https://via.placeholder.com/300x300?text=Keyboard",
+    "description": "Professional mechanical keyboard for typing enthusiasts"
+  },
+  {
+    "id": 5,
+    "name": "4K Monitor",
+    "title": "LG UltraWide 4K Monitor",
+    "price": 599,
+    "category": "Electronics",
+    "image": "https://via.placeholder.com/300x300?text=Monitor",
+    "description": "Stunning 34-inch ultrawide 4K display"
+  },
+  {
+    "id": 6,
+    "name": "Webcam HD",
+    "title": "Logitech C920 HD Webcam",
+    "price": 79,
+    "category": "Electronics",
+    "image": "https://via.placeholder.com/300x300?text=Webcam",
+    "description": "Crystal clear 1080p HD video conferencing camera"
+  },
+  {
+    "id": 7,
+    "name": "Desk Lamp",
+    "title": "BenQ e-Reading Lamp",
+    "price": 89,
+    "category": "Office",
+    "image": "https://via.placeholder.com/300x300?text=Lamp",
+    "description": "Eye-care desk lamp with adjustable brightness"
+  },
+  {
+    "id": 8,
+    "name": "Standing Desk",
+    "title": "Electric Standing Desk",
+    "price": 399,
+    "category": "Office",
+    "image": "https://via.placeholder.com/300x300?text=Desk",
+    "description": "Adjustable height electric standing desk for ergonomics"
+  }
+]

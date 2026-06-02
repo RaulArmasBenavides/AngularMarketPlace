@@ -1,0 +1,114 @@
+[
+  {
+    "id": 1,
+    "name": "Laptops",
+    "categoryId": 1,
+    "title_list": "Computers",
+    "url": "/products?category=computers&sub=laptops"
+  },
+  {
+    "id": 2,
+    "name": "Desktops",
+    "categoryId": 1,
+    "title_list": "Computers",
+    "url": "/products?category=computers&sub=desktops"
+  },
+  {
+    "id": 3,
+    "name": "Tablets",
+    "categoryId": 1,
+    "title_list": "Computers",
+    "url": "/products?category=computers&sub=tablets"
+  },
+  {
+    "id": 4,
+    "name": "Mice",
+    "categoryId": 1,
+    "title_list": "Accessories",
+    "url": "/products?category=electronics&sub=mice"
+  },
+  {
+    "id": 5,
+    "name": "Keyboards",
+    "categoryId": 1,
+    "title_list": "Accessories",
+    "url": "/products?category=electronics&sub=keyboards"
+  },
+  {
+    "id": 6,
+    "name": "Monitors",
+    "categoryId": 1,
+    "title_list": "Accessories",
+    "url": "/products?category=electronics&sub=monitors"
+  },
+  {
+    "id": 7,
+    "name": "Headphones",
+    "categoryId": 1,
+    "title_list": "Audio",
+    "url": "/products?category=electronics&sub=audio"
+  },
+  {
+    "id": 8,
+    "name": "Speakers",
+    "categoryId": 1,
+    "title_list": "Audio",
+    "url": "/products?category=electronics&sub=speakers"
+  },
+  {
+    "id": 9,
+    "name": "Desks",
+    "categoryId": 2,
+    "title_list": "Furniture",
+    "url": "/products?category=office&sub=desks"
+  },
+  {
+    "id": 10,
+    "name": "Chairs",
+    "categoryId": 2,
+    "title_list": "Furniture",
+    "url": "/products?category=office&sub=chairs"
+  },
+  {
+    "id": 11,
+    "name": "Shelving",
+    "categoryId": 2,
+    "title_list": "Furniture",
+    "url": "/products?category=office&sub=shelving"
+  },
+  {
+    "id": 12,
+    "name": "Pens",
+    "categoryId": 2,
+    "title_list": "Supplies",
+    "url": "/products?category=office&sub=supplies"
+  },
+  {
+    "id": 13,
+    "name": "Paper",
+    "categoryId": 2,
+    "title_list": "Supplies",
+    "url": "/products?category=office&sub=supplies"
+  },
+  {
+    "id": 14,
+    "name": "Lamps",
+    "categoryId": 2,
+    "title_list": "Lighting",
+    "url": "/products?category=office&sub=lighting"
+  },
+  {
+    "id": 15,
+    "name": "IDEs",
+    "categoryId": 3,
+    "title_list": "Development",
+    "url": "/products?category=software&sub=development"
+  },
+  {
+    "id": 16,
+    "name": "Design Tools",
+    "categoryId": 3,
+    "title_list": "Design",
+    "url": "/products?category=software&sub=design"
+  }
+]

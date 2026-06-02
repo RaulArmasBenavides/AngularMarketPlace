@@ -61,7 +61,7 @@ export class CategoryHierarchyService {
       map((allSubcategories) => ({
         category,
         titleList,
-        subcategories: allSubcategories.flat()
+        subcategories: allSubcategories.reduce((acc: SubCategoryItem[], items: SubCategoryItem[]) => [...acc, ...items], [])
       }))
     );
   }

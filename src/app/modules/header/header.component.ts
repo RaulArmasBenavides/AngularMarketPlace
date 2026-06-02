@@ -45,7 +45,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
 	getSubcategoriesByTitle(titleList: string): SubCategoryItem[] {
 		return this.categoriesWithSubcategories
-			.flatMap((cat) => cat.subcategories)
-			.filter((sub) => sub.titleList === titleList);
+			.reduce((acc: SubCategoryItem[], cat: CategoryWithSubcategories) => [
+				...acc,
+				...cat.subcategories
+			], [])
+			.filter((sub: SubCategoryItem) => sub.titleList === titleList);
 	}
 }

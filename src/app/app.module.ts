@@ -1,7 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -18,6 +17,9 @@ import { TabsDirective } from './directives/tabs.directive';
 import { MobileMenuDirective } from './directives/mobile-menu.directive';
 import { CustomScrollbarDirective } from './directives/custom-scrollbar.directive';
 
+import { HttpRequestInterceptor } from './core/interceptors/http-request.interceptor';
+import { HttpErrorInterceptor } from './core/interceptors/http-error.interceptor';
+
 @NgModule({
 	declarations: [
 		AppComponent,
@@ -30,6 +32,7 @@ import { CustomScrollbarDirective } from './directives/custom-scrollbar.directiv
 	bootstrap: [AppComponent],
 	imports: [
 		BrowserModule,
+		HttpClientModule,
 		AppRoutingModule,
 		ParallaxDirective,
 		StickyHeaderDirective,
@@ -38,7 +41,18 @@ import { CustomScrollbarDirective } from './directives/custom-scrollbar.directiv
 		MobileMenuDirective,
 		CustomScrollbarDirective
 	],
-	providers: [provideHttpClient(withInterceptorsFromDi())]
+	providers: [
+		{
+			provide: HTTP_INTERCEPTORS,
+			useClass: HttpRequestInterceptor,
+			multi: true
+		},
+		{
+			provide: HTTP_INTERCEPTORS,
+			useClass: HttpErrorInterceptor,
+			multi: true
+		}
+	]
 })
 export class AppModule {}
 
