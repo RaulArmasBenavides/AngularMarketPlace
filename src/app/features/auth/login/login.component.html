@@ -1,0 +1,79 @@
+<div class="login-container">
+  <div class="login-card">
+    <h1>Welcome Back</h1>
+    <p class="subtitle">Sign in to your account</p>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <!-- Email -->
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          class="form-control"
+          placeholder="you@example.com"
+          [class.is-invalid]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched"
+        />
+        <small *ngIf="loginForm.get('email')?.errors?.['required'] && loginForm.get('email')?.touched"
+          >Email is required</small
+        >
+        <small *ngIf="loginForm.get('email')?.errors?.['email'] && loginForm.get('email')?.touched"
+          >Please enter a valid email</small
+        >
+      </div>
+
+      <!-- Password -->
+      <div class="form-group">
+        <div class="password-header">
+          <label for="password">Password</label>
+          <a routerLink="/forgot-password" class="forgot-link">Forgot?</a>
+        </div>
+        <div class="password-input-wrapper">
+          <input
+            id="password"
+            [type]="showPassword ? 'text' : 'password'"
+            formControlName="password"
+            class="form-control"
+            placeholder="••••••••"
+            [class.is-invalid]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
+          />
+          <button type="button" class="toggle-password" (click)="togglePasswordVisibility()">
+            {{ showPassword ? '👁️‍🗨️' : '👁️' }}
+          </button>
+        </div>
+        <small *ngIf="loginForm.get('password')?.errors?.['required'] && loginForm.get('password')?.touched"
+          >Password is required</small
+        >
+        <small *ngIf="loginForm.get('password')?.errors?.['minlength'] && loginForm.get('password')?.touched"
+          >Password must be at least 6 characters</small
+        >
+      </div>
+
+      <!-- Submit Button -->
+      <button type="submit" class="btn-primary" [disabled]="isLoading">
+        {{ isLoading ? 'Signing in...' : 'Sign In' }}
+      </button>
+    </form>
+
+    <!-- Divider -->
+    <div class="divider">
+      <span>Or continue with</span>
+    </div>
+
+    <!-- Social Login -->
+    <div class="social-login">
+      <button type="button" class="social-btn google-btn" (click)="socialLogin('google')">
+        <span>Google</span>
+      </button>
+      <button type="button" class="social-btn facebook-btn" (click)="socialLogin('facebook')">
+        <span>Facebook</span>
+      </button>
+    </div>
+
+    <!-- Register Link -->
+    <p class="register-link">
+      Don't have an account? <a routerLink="/register">Sign up here</a>
+    </p>
+  </div>
+</div>

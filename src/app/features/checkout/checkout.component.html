@@ -1,0 +1,220 @@
+<div class="checkout-container">
+  <div class="checkout-wrapper">
+    <!-- Header -->
+    <div class="checkout-header">
+      <h1>Checkout</h1>
+      <p class="payment-provider">Payment by: <strong>{{ paymentProvider | uppercase }}</strong></p>
+    </div>
+
+    <div class="checkout-content">
+      <!-- Steps Indicator -->
+      <div class="steps-indicator">
+        <div class="step" [class.active]="currentStep === 1" [class.completed]="currentStep > 1">
+          <span class="step-number">1</span>
+          <span class="step-label">Shipping</span>
+        </div>
+        <div class="step-line" [class.completed]="currentStep > 1"></div>
+        <div class="step" [class.active]="currentStep === 2" [class.completed]="currentStep > 2">
+          <span class="step-number">2</span>
+          <span class="step-label">Payment</span>
+        </div>
+      </div>
+
+      <div class="checkout-main">
+        <!-- Left: Form -->
+        <div class="checkout-form">
+          <form [formGroup]="checkoutForm">
+            <!-- STEP 1: SHIPPING ADDRESS -->
+            <div class="form-section" *ngIf="currentStep === 1">
+              <h2>Shipping Address</h2>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="firstName">First Name *</label>
+                  <input
+                    id="firstName"
+                    type="text"
+                    formControlName="firstName"
+                    class="form-control"
+                    [class.is-invalid]="checkoutForm.get('firstName')?.invalid && checkoutForm.get('firstName')?.touched"
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="lastName">Last Name *</label>
+                  <input
+                    id="lastName"
+                    type="text"
+                    formControlName="lastName"
+                    class="form-control"
+                    [class.is-invalid]="checkoutForm.get('lastName')?.invalid && checkoutForm.get('lastName')?.touched"
+                  />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="street">Street Address *</label>
+                <input
+                  id="street"
+                  type="text"
+                  formControlName="street"
+                  class="form-control"
+                  [class.is-invalid]="checkoutForm.get('street')?.invalid && checkoutForm.get('street')?.touched"
+                />
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="city">City *</label>
+                  <input
+                    id="city"
+                    type="text"
+                    formControlName="city"
+                    class="form-control"
+                    [class.is-invalid]="checkoutForm.get('city')?.invalid && checkoutForm.get('city')?.touched"
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="state">State *</label>
+                  <input
+                    id="state"
+                    type="text"
+                    formControlName="state"
+                    class="form-control"
+                    [class.is-invalid]="checkoutForm.get('state')?.invalid && checkoutForm.get('state')?.touched"
+                  />
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="postalCode">Postal Code *</label>
+                  <input
+                    id="postalCode"
+                    type="text"
+                    formControlName="postalCode"
+                    class="form-control"
+                    [class.is-invalid]="checkoutForm.get('postalCode')?.invalid && checkoutForm.get('postalCode')?.touched"
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="country">Country *</label>
+                  <input
+                    id="country"
+                    type="text"
+                    formControlName="country"
+                    class="form-control"
+                    [class.is-invalid]="checkoutForm.get('country')?.invalid && checkoutForm.get('country')?.touched"
+                  />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="phone">Phone Number *</label>
+                <input
+                  id="phone"
+                  type="tel"
+                  formControlName="phone"
+                  class="form-control"
+                  [class.is-invalid]="checkoutForm.get('phone')?.invalid && checkoutForm.get('phone')?.touched"
+                />
+              </div>
+            </div>
+
+            <!-- STEP 2: PAYMENT -->
+            <div class="form-section" *ngIf="currentStep === 2">
+              <h2>Payment Method</h2>
+
+              <!-- Stripe Card Element -->
+              <div *ngIf="paymentProvider === 'stripe'" class="payment-section">
+                <div class="card-element" #cardElement></div>
+                <div class="form-group mt-3">
+                  <label>
+                    <input type="checkbox" formControlName="saveCard" />
+                    Save this card for future purchases
+                  </label>
+                </div>
+              </div>
+
+              <!-- PayPal Buttons -->
+              <div *ngIf="paymentProvider === 'paypal'" class="payment-section">
+                <div #paypalButtonContainer></div>
+              </div>
+            </div>
+          </form>
+
+          <!-- Navigation Buttons -->
+          <div class="form-actions">
+            <button
+              class="btn-secondary"
+              (click)="previousStep()"
+              *ngIf="currentStep === 2"
+              [disabled]="isProcessingPayment"
+            >
+              ← Back
+            </button>
+
+            <button
+              class="btn-primary"
+              (click)="nextStep()"
+              *ngIf="currentStep === 1"
+              [disabled]="isProcessingPayment || checkoutForm.get('firstName')?.invalid"
+            >
+              Continue to Payment →
+            </button>
+
+            <button
+              class="btn-primary"
+              (click)="onSubmit()"
+              *ngIf="currentStep === 2 && paymentProvider === 'stripe'"
+              [disabled]="isProcessingPayment"
+            >
+              {{ isProcessingPayment ? 'Processing...' : 'Complete Purchase' }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Right: Order Summary -->
+        <aside class="order-summary">
+          <h2>Order Summary</h2>
+
+          <div class="cart-items">
+            <div *ngFor="let item of cartItems" class="cart-item">
+              <div class="item-info">
+                <span class="item-name">{{ item.name }}</span>
+                <span class="item-quantity">x{{ item.quantity }}</span>
+              </div>
+              <span class="item-price">${{ item.price * item.quantity }}</span>
+            </div>
+          </div>
+
+          <div class="summary-divider"></div>
+
+          <div class="summary-line">
+            <span>Subtotal</span>
+            <span>${{ subtotal }}</span>
+          </div>
+
+          <div class="summary-line">
+            <span>Shipping</span>
+            <span>${{ shipping }}</span>
+          </div>
+
+          <div class="summary-line">
+            <span>Tax</span>
+            <span>${{ tax }}</span>
+          </div>
+
+          <div class="summary-total">
+            <span>Total</span>
+            <span>${{ total }}</span>
+          </div>
+
+          <!-- Security Badge -->
+          <div class="security-badge">
+            <span>🔒 Secure checkout powered by {{ paymentProvider | uppercase }}</span>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </div>
+</div>

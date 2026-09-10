@@ -4,8 +4,22 @@
 
 export const environment = {
 	production: false,
-	marketPlaceUrl: 'https://marketplace-16c58.firebaseio.com/',
-	assets: 'http://localhost:4200/assets/'
+	marketPlaceUrl: 'http://localhost:3000/api',
+	assets: 'http://localhost:4200/assets/',
+
+	// Payment Provider: 'stripe' | 'paypal'
+	paymentProvider: 'stripe',
+
+	// Stripe Configuration
+	stripe: {
+		publishableKey: 'pk_test_YOUR_STRIPE_KEY_HERE',
+	},
+
+	// PayPal Configuration
+	paypal: {
+		clientId: 'YOUR_PAYPAL_CLIENT_ID_HERE',
+		currency: 'USD',
+	},
 };
 
 /*
