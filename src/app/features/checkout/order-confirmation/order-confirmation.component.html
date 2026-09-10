@@ -1,0 +1,60 @@
+<div class="confirmation-container">
+  <div class="confirmation-content">
+    <!-- Success Icon -->
+    <div class="success-icon">✓</div>
+
+    <h1>Order Confirmed!</h1>
+    <p class="subtitle">Thank you for your purchase</p>
+
+    <!-- Order Details Card -->
+    <div class="order-card">
+      <div class="order-detail">
+        <label>Order Number</label>
+        <p class="order-value">{{ orderNumber }}</p>
+      </div>
+
+      <div class="order-detail">
+        <label>Order Date</label>
+        <p class="order-value">{{ orderDate | date: 'mediumDate' }}</p>
+      </div>
+
+      <div class="order-detail">
+        <label>Estimated Delivery</label>
+        <p class="order-value">{{ estimatedDelivery | date: 'mediumDate' }}</p>
+      </div>
+
+      <div class="order-detail">
+        <label>Status</label>
+        <p class="order-value status">{{ orderStatus | uppercase }}</p>
+      </div>
+    </div>
+
+    <!-- Message -->
+    <div class="message">
+      <p>We've sent a confirmation email to your email address. You can track your order status below.</p>
+    </div>
+
+    <!-- Actions -->
+    <div class="actions">
+      <button class="btn-primary" (click)="trackOrder()">Track Order</button>
+      <button class="btn-secondary" (click)="downloadInvoice()">Download Invoice</button>
+    </div>
+
+    <!-- Continue Shopping -->
+    <div class="continue-shopping">
+      <p>Ready to shop more?</p>
+      <a routerLink="/products" class="link">Continue Shopping</a>
+    </div>
+  </div>
+
+  <!-- Info Box -->
+  <div class="info-box">
+    <h3>📧 What's Next?</h3>
+    <ul>
+      <li>Confirmation email sent to your inbox</li>
+      <li>Order processing begins immediately</li>
+      <li>You'll receive shipping confirmation within 24 hours</li>
+      <li>Track your package in real-time</li>
+    </ul>
+  </div>
+</div>

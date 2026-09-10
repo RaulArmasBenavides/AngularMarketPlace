@@ -1,0 +1,151 @@
+<div class="dashboard-container">
+  <!-- Header -->
+  <div class="dashboard-header">
+    <div class="header-content">
+      <h1>Welcome, {{ currentUser?.firstName }}!</h1>
+      <p>Manage your account and view your orders</p>
+    </div>
+    <button class="btn-logout" (click)="logout()">Logout</button>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon">📦</div>
+      <div class="stat-info">
+        <div class="stat-label">Total Orders</div>
+        <div class="stat-value">{{ stats.totalOrders }}</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon">💰</div>
+      <div class="stat-info">
+        <div class="stat-label">Total Spent</div>
+        <div class="stat-value">${{ stats.totalSpent }}</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon">⏱️</div>
+      <div class="stat-info">
+        <div class="stat-label">Last Order</div>
+        <div class="stat-value">{{ stats.lastOrder }}</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon">👤</div>
+      <div class="stat-info">
+        <div class="stat-label">Member Since</div>
+        <div class="stat-value">{{ stats.memberSince }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="dashboard-tabs">
+    <button
+      class="tab-button"
+      [class.active]="activeTab === 'orders'"
+      (click)="activeTab = 'orders'"
+    >
+      Orders
+    </button>
+    <button
+      class="tab-button"
+      [class.active]="activeTab === 'addresses'"
+      (click)="activeTab = 'addresses'"
+    >
+      Addresses
+    </button>
+    <button
+      class="tab-button"
+      [class.active]="activeTab === 'profile'"
+      (click)="activeTab = 'profile'"
+    >
+      Profile
+    </button>
+  </div>
+
+  <!-- Orders Tab -->
+  <div class="tab-content" *ngIf="activeTab === 'orders'">
+    <div class="section-title">Recent Orders</div>
+    <table class="orders-table">
+      <thead>
+        <tr>
+          <th>Order Number</th>
+          <th>Date</th>
+          <th>Status</th>
+          <th>Total</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let order of orders">
+          <td>{{ order.number }}</td>
+          <td>{{ order.date }}</td>
+          <td>
+            <span class="status-badge" [style.backgroundColor]="getStatusColor(order.status)">
+              {{ order.status | uppercase }}
+            </span>
+          </td>
+          <td>${{ order.total }}</td>
+          <td>
+            <a href="#" class="link">View Details</a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Addresses Tab -->
+  <div class="tab-content" *ngIf="activeTab === 'addresses'">
+    <div class="section-title">Shipping Addresses</div>
+    <div class="addresses-grid">
+      <div *ngFor="let address of addresses" class="address-card">
+        <div class="address-header">
+          <h3>{{ address.name }}</h3>
+          <span *ngIf="address.isDefault" class="badge-default">Default</span>
+        </div>
+        <p>{{ address.street }}</p>
+        <p>{{ address.city }}, {{ address.state }} {{ address.zip }}</p>
+        <div class="address-actions">
+          <a href="#" class="link">Edit</a>
+          <span class="separator">•</span>
+          <a href="#" class="link delete">Delete</a>
+        </div>
+      </div>
+
+      <button class="btn-add-address">+ Add New Address</button>
+    </div>
+  </div>
+
+  <!-- Profile Tab -->
+  <div class="tab-content" *ngIf="activeTab === 'profile'">
+    <div class="section-title">Profile Information</div>
+    <div class="profile-card">
+      <div class="profile-field">
+        <label>Email</label>
+        <p>{{ currentUser?.email }}</p>
+      </div>
+
+      <div class="profile-field">
+        <label>First Name</label>
+        <p>{{ currentUser?.firstName }}</p>
+      </div>
+
+      <div class="profile-field">
+        <label>Last Name</label>
+        <p>{{ currentUser?.lastName }}</p>
+      </div>
+
+      <div class="profile-field">
+        <label>Phone</label>
+        <p>{{ currentUser?.phone || 'Not provided' }}</p>
+      </div>
+
+      <button class="btn-primary">Edit Profile</button>
+    </div>
+  </div>
+</div>
