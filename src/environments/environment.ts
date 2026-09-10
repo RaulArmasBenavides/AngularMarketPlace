@@ -20,6 +20,23 @@ export const environment = {
 		clientId: 'YOUR_PAYPAL_CLIENT_ID_HERE',
 		currency: 'USD',
 	},
+
+	// Analytics & Advertising
+	// Google Analytics 4 - Get from Google Analytics Dashboard
+	googleAnalyticsId: 'G-XXXXXXXXXX',
+
+	// Meta Pixel - Get from Meta Business Suite
+	metaPixelId: 'YOUR_META_PIXEL_ID',
+
+	// Google Ads Conversion Tracking
+	// Format: AW-XXXXXXXXX/AbCdEfGhIjKlMnOpQr
+	googleAdsConversionId: 'AW-XXXXXXXXX/CONVERSION_LABEL',
+
+	// Google Merchant Center
+	googleMerchantCenterId: 'YOUR_MERCHANT_ID',
+
+	// Facebook Catalog ID
+	facebookCatalogId: 'YOUR_CATALOG_ID',
 };
 
 /*
