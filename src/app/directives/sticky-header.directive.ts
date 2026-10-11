@@ -5,7 +5,7 @@ import { Directive, ElementRef, HostListener, Input, Renderer2 } from '@angular/
   standalone: true
 })
 export class StickyHeaderDirective {
-  @Input() stickyThreshold: number = 50;
+  @Input() stickyThreshold = 50;
 
   constructor(
     private readonly elRef: ElementRef,

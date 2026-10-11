@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { PaymentService } from '../../services/payment.service';
-import { CartService } from '../../services/cart.service';
+import { CartService, CartItem } from '../../services/cart.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
@@ -13,6 +13,17 @@ interface ShippingAddress {
   postalCode: string;
   country: string;
   phone: string;
+}
+
+interface PaymentPayload {
+  paymentIntentId: string;
+  provider: 'stripe' | 'paypal';
+  shippingAddress: ShippingAddress;
+  items: CartItem[];
+  subtotal: number;
+  shipping: number;
+  tax: number;
+  payerId?: string;
 }
 
 @Component({
@@ -37,7 +48,7 @@ export class PaymentComponent implements OnInit, OnDestroy {
     phone: '',
   };
 
-  cartItems: any[] = [];
+  cartItems: CartItem[] = [];
   subtotal = 0;
   shipping = 10;
   tax = 0;
@@ -148,14 +159,13 @@ export class PaymentComponent implements OnInit, OnDestroy {
     window.location.href = intentResponse.approvalUrl;
   }
 
-  // Completar pago (llamado después de PayPal aprobación)
   async completePayment(
     orderId: string,
     paymentIntentId: string,
     provider: 'stripe' | 'paypal'
   ): Promise<void> {
     try {
-      const payload = {
+      const payload: PaymentPayload = {
         paymentIntentId,
         provider,
         shippingAddress: this.shippingAddress,
@@ -165,11 +175,10 @@ export class PaymentComponent implements OnInit, OnDestroy {
         tax: this.tax,
       };
 
-      // Si es PayPal, agregar payerId
       if (provider === 'paypal') {
         const payerId = this.paymentService.getPayerIdFromUrl();
         if (payerId) {
-          (payload as any).payerId = payerId;
+          payload.payerId = payerId;
         }
       }
 

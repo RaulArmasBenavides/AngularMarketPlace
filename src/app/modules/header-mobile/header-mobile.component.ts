@@ -6,7 +6,7 @@ import { CategoryHierarchyService } from '../../services/category-hierarchy.serv
 import { Category } from '../../models/category.model';
 
 export interface MobileCategory extends Category {
-	subcategories: Array<{ name: string; url: string }>;
+	subcategories: { name: string; url: string }[];
 }
 
 @Component({

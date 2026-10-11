@@ -95,7 +95,7 @@ export class CategoryHierarchyService {
     }));
   }
 
-  getFooterCategories(): Observable<Array<{ category: string; subcategories: SubCategoryItem[] }>> {
+  getFooterCategories(): Observable<{ category: string; subcategories: SubCategoryItem[] }[]> {
     return this.categoriesService.getData().pipe(
       switchMap((categories: Category[]) => {
         const requests = categories.map((category) =>

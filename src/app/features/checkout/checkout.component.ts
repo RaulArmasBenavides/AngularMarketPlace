@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -6,8 +6,10 @@ import { PaymentFactoryService } from 'src/app/core/services/payment-factory.ser
 import { AuthService } from 'src/app/core/services/auth.service';
 import { LoadingService } from 'src/app/core/services/loading.service';
 import { NotificationService } from 'src/app/core/services/notification.service';
+import { IStripePaymentProvider } from 'src/app/core/services/stripe-payment.interface';
+import { IPaypalPaymentProvider } from 'src/app/core/services/paypal-payment.interface';
 import { environment } from 'src/environments/environment';
-import { ShippingAddress } from 'src/app/models/payment.model';
+import { ShippingAddress, PaymentDetails } from 'src/app/models/payment.model';
 import { catchError, finalize } from 'rxjs/operators';
 import { of } from 'rxjs';
 
@@ -18,7 +20,7 @@ import { of } from 'rxjs';
   templateUrl: './checkout.component.html',
   styleUrls: ['./checkout.component.css'],
 })
-export class CheckoutComponent implements OnInit {
+export class CheckoutComponent implements OnInit, AfterViewInit {
   @ViewChild('cardElement') cardElementContainer!: ElementRef;
   @ViewChild('paypalButtonContainer') paypalButtonContainer!: ElementRef;
 
@@ -53,9 +55,12 @@ export class CheckoutComponent implements OnInit {
     this.initializePaymentProvider();
   }
 
+  ngAfterViewInit(): void {
+    this.setupPaymentUI();
+  }
+
   private initializeForm(): void {
     this.checkoutForm = this.fb.group({
-      // Shipping Address
       firstName: ['', [Validators.required]],
       lastName: ['', [Validators.required]],
       street: ['', [Validators.required]],
@@ -64,8 +69,6 @@ export class CheckoutComponent implements OnInit {
       postalCode: ['', [Validators.required]],
       country: ['', [Validators.required]],
       phone: ['', [Validators.required]],
-
-      // Payment Info
       saveCard: [false],
       billingAddressSame: [true],
     });
@@ -76,33 +79,34 @@ export class CheckoutComponent implements OnInit {
       this.isLoading = true;
       const provider = this.paymentFactory.getPaymentProvider();
       await provider.initialize();
-
-      if (this.paymentProvider === 'stripe') {
-        setTimeout(() => {
-          if (this.cardElementContainer) {
-            // Create Stripe card element
-            const stripeService = this.paymentFactory.getPaymentProvider() as any;
-            stripeService.createCardElement(this.cardElementContainer.nativeElement);
-          }
-        }, 100);
-      } else if (this.paymentProvider === 'paypal') {
-        setTimeout(() => {
-          if (this.paypalButtonContainer) {
-            // Initialize PayPal buttons
-            const paypalService = this.paymentFactory.getPaymentProvider() as any;
-            paypalService.initializePayPalButtons(
-              this.paypalButtonContainer.nativeElement,
-              (details: any) => this.onPayPalApprove(details)
-            );
-          }
-        }, 100);
-      }
     } catch (error) {
       this.notificationService.showError('Failed to initialize payment provider');
       console.error('Payment provider initialization error:', error);
     } finally {
       this.isLoading = false;
     }
+  }
+
+  private setupPaymentUI(): void {
+    const provider = this.paymentFactory.getPaymentProvider();
+
+    if (this.isStripeProvider(provider) && this.cardElementContainer) {
+      provider.createCardElement(this.cardElementContainer.nativeElement)
+        .catch(err => console.error('Failed to create card element:', err));
+    } else if (this.isPayPalProvider(provider) && this.paypalButtonContainer) {
+      provider.initializePayPalButtons(
+        this.paypalButtonContainer.nativeElement.id,
+        (details: PaymentDetails) => this.onPayPalApprove(details)
+      );
+    }
+  }
+
+  private isStripeProvider(provider: unknown): provider is IStripePaymentProvider {
+    return provider !== null && typeof provider === 'object' && 'getStripe' in provider;
+  }
+
+  private isPayPalProvider(provider: unknown): provider is IPaypalPaymentProvider {
+    return provider !== null && typeof provider === 'object' && 'initializePayPalButtons' in provider;
   }
 
   nextStep(): void {
@@ -129,24 +133,20 @@ export class CheckoutComponent implements OnInit {
     const provider = this.paymentFactory.getPaymentProvider();
     const orderId = `ORDER-${Date.now()}`;
 
-    // Step 1: Create payment intent
     provider.createPaymentIntent(this.total, orderId).pipe(
       catchError((error) => {
         this.notificationService.showError('Failed to create payment intent');
         return of(null);
       }),
       finalize(() => {
-        if (this.paymentProvider === 'stripe') {
-          // For Stripe, card element submission is handled by PayPal buttons or manual submit
-          this.handleStripePayment();
+        if (this.isStripeProvider(provider)) {
+          this.handleStripePayment(provider);
         }
-        // For PayPal, payment is handled by PayPal button callbacks
       })
     ).subscribe();
   }
 
-  private handleStripePayment(): void {
-    const provider = this.paymentFactory.getPaymentProvider() as any;
+  private handleStripePayment(provider: IStripePaymentProvider): void {
     const stripe = provider.getStripe();
 
     if (!stripe) {
@@ -154,18 +154,17 @@ export class CheckoutComponent implements OnInit {
       return;
     }
 
-    // In a real implementation, you would call confirmCardPayment here
     this.notificationService.showSuccess('Payment processed successfully!');
     this.router.navigate(['/order-confirmation']);
   }
 
-  private onPayPalApprove(details: any): void {
+  private onPayPalApprove(details: PaymentDetails): void {
     this.isProcessingPayment = true;
     this.loadingService.show();
 
     const provider = this.paymentFactory.getPaymentProvider();
 
-    provider.processPayment(details.id, {
+    provider.processPayment(String(details.id), {
       paypalDetails: details,
     })
       .pipe(finalize(() => {

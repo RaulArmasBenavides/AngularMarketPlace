@@ -17,7 +17,7 @@ import { ProductCatalogService } from './core/services/product-catalog.service';
 })
 export class AppComponent implements OnInit {
   items: MasonryItem[] = [];
-  activeFilter: string = '*';
+  activeFilter = '*';
 
   constructor(
     private analyticsService: AnalyticsService,

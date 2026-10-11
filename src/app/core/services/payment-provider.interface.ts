@@ -1,6 +1,8 @@
 import { Observable } from 'rxjs';
 import { PaymentIntent, PaymentMethod } from 'src/app/models/payment.model';
 
+export type PaymentDetails = Record<string, unknown>;
+
 export interface IPaymentProvider {
   /**
    * Initialize payment provider with configuration
@@ -15,7 +17,7 @@ export interface IPaymentProvider {
   /**
    * Process payment with payment method details
    */
-  processPayment(paymentIntentId: string, paymentDetails: any): Observable<{ success: boolean; message: string }>;
+  processPayment(paymentIntentId: string, paymentDetails: PaymentDetails): Observable<{ success: boolean; message: string }>;
 
   /**
    * Get saved payment methods for user
@@ -25,7 +27,7 @@ export interface IPaymentProvider {
   /**
    * Save a payment method for future use
    */
-  savePaymentMethod(paymentDetails: any): Observable<PaymentMethod>;
+  savePaymentMethod(paymentDetails: PaymentDetails): Observable<PaymentMethod>;
 
   /**
    * Delete a saved payment method

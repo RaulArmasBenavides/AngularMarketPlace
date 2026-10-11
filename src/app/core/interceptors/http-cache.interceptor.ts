@@ -20,7 +20,7 @@ export class HttpCacheInterceptor implements HttpInterceptor {
   ];
 
   // Duración de caché por patrón de URL
-  private cacheDuration: { [key: string]: number } = {
+  private cacheDuration: Record<string, number> = {
     '/categories': 10 * 60 * 1000, // 10 minutos
     '/products': 5 * 60 * 1000,    // 5 minutos
     '/users': 5 * 60 * 1000        // 5 minutos

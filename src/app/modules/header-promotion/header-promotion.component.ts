@@ -22,7 +22,7 @@ export interface TopBanner {
 export class HeaderPromotionComponent implements OnInit, OnDestroy {
 	path: string = environment.assets;
 	topBanner: TopBanner | null = null;
-	isLoading: boolean = true;
+	isLoading = true;
 	private destroy$ = new Subject<void>();
 
 	constructor(private readonly productsService: ProductsService) {}

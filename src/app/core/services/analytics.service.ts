@@ -1,10 +1,28 @@
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
 
+interface GTagFunction {
+  (command: 'js', timestamp: Date): void;
+  (command: 'config', id: string, config?: Record<string, unknown>): void;
+}
+
+interface FacebookPixelQueue {
+  callMethod?: Function;
+  queue?: unknown[];
+}
+
+interface FacebookPixel extends FacebookPixelQueue {
+  (...args: unknown[]): void;
+  push: (args: unknown) => void;
+  loaded?: boolean;
+  version?: string;
+}
+
 declare global {
   interface Window {
-    gtag?: any;
-    fbq?: any;
+    gtag?: GTagFunction;
+    fbq?: FacebookPixel;
+    dataLayer?: unknown[];
   }
 }
 
@@ -16,17 +34,11 @@ export class AnalyticsService {
     this.initializeAnalytics();
   }
 
-  /**
-   * Initialize Google Analytics 4 and Meta Pixel
-   */
   private initializeAnalytics(): void {
     this.loadGoogleAnalytics();
     this.loadMetaPixel();
   }
 
-  /**
-   * Load Google Analytics 4
-   */
   private loadGoogleAnalytics(): void {
     if (!environment.googleAnalyticsId) {
       console.warn('Google Analytics ID not configured');
@@ -39,9 +51,9 @@ export class AnalyticsService {
     document.head.appendChild(script);
 
     window.dataLayer = window.dataLayer || [];
-    function gtag(...args: any[]) {
+    const gtag: GTagFunction = (...args: unknown[]) => {
       window.dataLayer!.push(args);
-    }
+    };
     window.gtag = gtag;
     gtag('js', new Date());
     gtag('config', environment.googleAnalyticsId);
@@ -49,26 +61,25 @@ export class AnalyticsService {
     console.log('✅ Google Analytics 4 initialized');
   }
 
-  /**
-   * Load Meta Pixel
-   */
   private loadMetaPixel(): void {
     if (!environment.metaPixelId) {
       console.warn('Meta Pixel ID not configured');
       return;
     }
 
-    (window as any).fbq =
-      (window as any).fbq ||
-      function () {
-        (window as any).fbq.callMethod
-          ? (window as any).fbq.callMethod.apply((window as any).fbq, arguments)
-          : (window as any).fbq.queue.push(arguments);
-      };
-    (window as any).fbq.push = (window as any).fbq;
-    (window as any).fbq.loaded = true;
-    (window as any).fbq.version = '2.0';
-    (window as any).fbq.queue = [];
+    const fbq: FacebookPixel = function (...args: unknown[]) {
+      if (fbq.callMethod) {
+        fbq.callMethod.apply(fbq, args as unknown[]);
+      } else {
+        fbq.queue?.push(args);
+      }
+    } as FacebookPixel;
+
+    fbq.push = fbq;
+    fbq.loaded = true;
+    fbq.version = '2.0';
+    fbq.queue = [];
+    window.fbq = fbq;
 
     const script = document.createElement('script');
     script.async = true;
@@ -134,7 +145,7 @@ export class AnalyticsService {
   /**
    * Track add to cart
    */
-  trackAddToCart(product: any, quantity: number = 1): void {
+  trackAddToCart(product: any, quantity = 1): void {
     // Google Analytics
     if (window.gtag) {
       window.gtag('event', 'add_to_cart', {
@@ -169,7 +180,7 @@ export class AnalyticsService {
   /**
    * Track remove from cart
    */
-  trackRemoveFromCart(product: any, quantity: number = 1): void {
+  trackRemoveFromCart(product: any, quantity = 1): void {
     if (window.gtag) {
       window.gtag('event', 'remove_from_cart', {
         currency: 'USD',

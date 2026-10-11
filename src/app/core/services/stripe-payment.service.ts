@@ -2,14 +2,15 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
-import { IPaymentProvider } from './payment-provider.interface';
+import { PaymentDetails, IPaymentProvider } from './payment-provider.interface';
+import { IStripePaymentProvider } from './stripe-payment.interface';
 import { PaymentIntent, PaymentMethod } from 'src/app/models/payment.model';
 import { loadStripe, Stripe, StripeCardElement } from '@stripe/stripe-js';
 
 @Injectable({
   providedIn: 'root'
 })
-export class StripePaymentService implements IPaymentProvider {
+export class StripePaymentService implements IStripePaymentProvider {
   private stripe: Stripe | null = null;
   private cardElement: StripeCardElement | null = null;
   private readonly apiUrl = environment.marketPlaceUrl;
@@ -25,13 +26,13 @@ export class StripePaymentService implements IPaymentProvider {
 
   createPaymentIntent(amount: number, orderId: string): Observable<PaymentIntent> {
     return this.http.post<PaymentIntent>(`${this.apiUrl}/payments/create-intent`, {
-      amount: Math.round(amount * 100), // Convert to cents
+      amount: Math.round(amount * 100),
       orderId,
       provider: 'stripe',
     });
   }
 
-  processPayment(paymentIntentId: string, paymentDetails: any): Observable<{ success: boolean; message: string }> {
+  processPayment(paymentIntentId: string, paymentDetails: PaymentDetails): Observable<{ success: boolean; message: string }> {
     return this.http.post<{ success: boolean; message: string }>(`${this.apiUrl}/payments/process`, {
       paymentIntentId,
       provider: 'stripe',
@@ -43,7 +44,7 @@ export class StripePaymentService implements IPaymentProvider {
     return this.http.get<PaymentMethod[]>(`${this.apiUrl}/payments/methods`);
   }
 
-  savePaymentMethod(paymentDetails: any): Observable<PaymentMethod> {
+  savePaymentMethod(paymentDetails: PaymentDetails): Observable<PaymentMethod> {
     return this.http.post<PaymentMethod>(`${this.apiUrl}/payments/methods`, {
       provider: 'stripe',
       ...paymentDetails,
@@ -58,16 +59,10 @@ export class StripePaymentService implements IPaymentProvider {
     return 'Stripe';
   }
 
-  /**
-   * Stripe-specific: Get Stripe instance
-   */
   getStripe(): Stripe | null {
     return this.stripe;
   }
 
-  /**
-   * Stripe-specific: Create card element
-   */
   async createCardElement(elementContainer: HTMLElement): Promise<StripeCardElement | null> {
     if (!this.stripe) {
       await this.initialize();
@@ -82,10 +77,7 @@ export class StripePaymentService implements IPaymentProvider {
     return null;
   }
 
-  /**
-   * Stripe-specific: Confirm card payment
-   */
-  async confirmCardPayment(clientSecret: string): Promise<any> {
+  async confirmCardPayment(clientSecret: string): Promise<{ paymentIntent?: { status: string; client_secret: string } }> {
     if (!this.stripe) {
       throw new Error('Stripe not initialized');
     }

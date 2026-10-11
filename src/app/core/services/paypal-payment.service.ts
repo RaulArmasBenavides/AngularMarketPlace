@@ -2,19 +2,20 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
-import { IPaymentProvider } from './payment-provider.interface';
+import { PaymentDetails } from './payment-provider.interface';
+import { IPaypalPaymentProvider } from './paypal-payment.interface';
 import { PaymentIntent, PaymentMethod } from 'src/app/models/payment.model';
 
-declare global {
-  interface Window {
-    paypal?: any;
-  }
+interface PayPalWindow extends Window {
+  paypal?: {
+    Buttons: (config: { createOrder: Function; onApprove: Function; onError: Function }) => { render: Function };
+  };
 }
 
 @Injectable({
   providedIn: 'root'
 })
-export class PaypalPaymentService implements IPaymentProvider {
+export class PaypalPaymentService implements IPaypalPaymentProvider {
   private readonly apiUrl = environment.marketPlaceUrl;
 
   constructor(private http: HttpClient) {}
@@ -38,7 +39,7 @@ export class PaypalPaymentService implements IPaymentProvider {
     });
   }
 
-  processPayment(paymentIntentId: string, paymentDetails: any): Observable<{ success: boolean; message: string }> {
+  processPayment(paymentIntentId: string, paymentDetails: PaymentDetails): Observable<{ success: boolean; message: string }> {
     return this.http.post<{ success: boolean; message: string }>(`${this.apiUrl}/payments/process`, {
       paymentIntentId,
       provider: 'paypal',
@@ -50,7 +51,7 @@ export class PaypalPaymentService implements IPaymentProvider {
     return this.http.get<PaymentMethod[]>(`${this.apiUrl}/payments/methods`);
   }
 
-  savePaymentMethod(paymentDetails: any): Observable<PaymentMethod> {
+  savePaymentMethod(paymentDetails: PaymentDetails): Observable<PaymentMethod> {
     return this.http.post<PaymentMethod>(`${this.apiUrl}/payments/methods`, {
       provider: 'paypal',
       ...paymentDetails,
@@ -65,30 +66,28 @@ export class PaypalPaymentService implements IPaymentProvider {
     return 'PayPal';
   }
 
-  /**
-   * PayPal-specific: Initialize PayPal buttons
-   */
-  initializePayPalButtons(containerSelector: string, onApprove: (details: any) => void): void {
-    if (!window.paypal) {
+  initializePayPalButtons(containerSelector: string, onApprove: (details: PaymentDetails) => void): void {
+    const paypalWindow = window as PayPalWindow;
+    if (!paypalWindow.paypal) {
       throw new Error('PayPal SDK not loaded');
     }
 
-    window.paypal.Buttons({
-      createOrder: (data: any, actions: any) => {
+    paypalWindow.paypal.Buttons({
+      createOrder: (data: unknown, actions: { order: { create: Function } }) => {
         return actions.order.create({
           purchase_units: [{
             amount: {
-              value: data.amount,
+              value: (data as Record<string, unknown>).amount,
             },
           }],
         });
       },
-      onApprove: (data: any, actions: any) => {
-        return actions.order.capture().then((details: any) => {
+      onApprove: (data: unknown, actions: { order: { capture: Function } }) => {
+        return actions.order.capture().then((details: PaymentDetails) => {
           onApprove(details);
         });
       },
-      onError: (err: any) => {
+      onError: (err: Error) => {
         console.error('PayPal error:', err);
       },
     }).render(containerSelector);

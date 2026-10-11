@@ -16,19 +16,19 @@ export class NotificationService {
   public notifications$ = this.notificationsSubject.asObservable();
   private notificationId = 0;
 
-  showSuccess(message: string, duration: number = 5000): void {
+  showSuccess(message: string, duration = 5000): void {
     this.show({ message, type: 'success', duration });
   }
 
-  showError(message: string, duration: number = 5000): void {
+  showError(message: string, duration = 5000): void {
     this.show({ message, type: 'error', duration });
   }
 
-  showWarning(message: string, duration: number = 5000): void {
+  showWarning(message: string, duration = 5000): void {
     this.show({ message, type: 'warning', duration });
   }
 
-  showInfo(message: string, duration: number = 5000): void {
+  showInfo(message: string, duration = 5000): void {
     this.show({ message, type: 'info', duration });
   }
 

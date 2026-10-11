@@ -6,12 +6,12 @@ import { CategoryHierarchyService } from '../../services/category-hierarchy.serv
 
 export interface CategoryWithSubcategories {
 	category: string;
-	subcategories: Array<{
+	subcategories: {
 		titleList: string;
 		subcategory: string;
 		url: string;
 		category?: string;
-	}>;
+	}[];
 }
 
 @Component({

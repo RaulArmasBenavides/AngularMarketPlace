@@ -9,7 +9,7 @@ import { MasonryItem } from './modals/MasonryItem.model';
 })
 export class AppComponent implements OnInit {
 	items: MasonryItem[] = [];
-	activeFilter: string = '*';
+	activeFilter = '*';
 
 	constructor() {}
 
