@@ -1,14 +1,15 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, shareReplay } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
-import { MockDataService } from '../core/services/mock-data.service';
 
 export interface SubCategory {
 	id: number;
 	name: string;
 	categoryId: number;
+	title_list?: string;
+	url?: string;
 }
 
 @Injectable({
@@ -18,32 +19,20 @@ export class SubCategoriesService {
 	private readonly api: string = environment.marketPlaceUrl;
 	private subCategoriesCache = new Map<string, Observable<SubCategory[]>>();
 
-	constructor(
-		private readonly http: HttpClient,
-		private readonly mockDataService: MockDataService
-	) {}
+	constructor(private readonly http: HttpClient) {}
 
+	/** Subcategorías donde `orderBy` es igual a `equalTo` (p. ej. 'title_list', 'Computers'). */
 	getFilterData(orderBy: string, equalTo: string): Observable<SubCategory[]> {
 		const cacheKey = `${orderBy}:${equalTo}`;
 
-		// ✅ Caché basado en parámetros
 		if (!this.subCategoriesCache.has(cacheKey)) {
-			// 🎯 Primero intenta mock data (local JSON)
-			// Si no existe, fallback a backend
-			const request$ = this.mockDataService.getFilteredSubCategories(orderBy, equalTo).pipe(
-				catchError((mockError) => {
-					console.log('Mock data not available, trying backend:', mockError.message);
-					// Si mock data no existe, intenta backend
-					return this.http.get<SubCategory[]>(
-						`${this.api}sub-categories.json?orderBy="${orderBy}"&equalTo="${equalTo}"&print=pretty`
-					).pipe(
-						catchError((backendError) => {
-							console.error('Backend unavailable:', backendError.message);
-							return this.handleError(backendError);
-						})
-					);
+			const params = new HttpParams().set(orderBy, equalTo);
+			const request$ = this.http.get<SubCategory[]>(`${this.api}subcategories`, { params }).pipe(
+				catchError((error: HttpErrorResponse) => {
+					this.subCategoriesCache.delete(cacheKey); // permitir reintentar
+					return this.handleError(error);
 				}),
-				shareReplay(1) // ✅ Cachea la respuesta
+				shareReplay(1)
 			);
 			this.subCategoriesCache.set(cacheKey, request$);
 		}
@@ -51,25 +40,17 @@ export class SubCategoriesService {
 		return this.subCategoriesCache.get(cacheKey)!;
 	}
 
-	// ✅ Invalidar caché específico por parámetro
 	invalidateCache(orderBy?: string, equalTo?: string): void {
 		if (orderBy && equalTo) {
-			const cacheKey = `${orderBy}:${equalTo}`;
-			this.subCategoriesCache.delete(cacheKey);
+			this.subCategoriesCache.delete(`${orderBy}:${equalTo}`);
 		} else {
-			// Limpiar todo el caché
 			this.subCategoriesCache.clear();
 		}
 	}
 
 	private handleError(error: HttpErrorResponse): Observable<never> {
-		let errorMessage = 'An error occurred while fetching sub-categories';
-		if (error.error instanceof ErrorEvent) {
-			errorMessage = error.error.message;
-		} else {
-			errorMessage = `Error Code: ${error.status}\nMessage: ${error.message}`;
-		}
-		console.error(errorMessage);
-		return throwError(() => new Error(errorMessage));
+		const message = `Error al cargar subcategorías (${error.status || 'sin conexión'})`;
+		console.error(message, error.message);
+		return throwError(() => new Error(message));
 	}
 }

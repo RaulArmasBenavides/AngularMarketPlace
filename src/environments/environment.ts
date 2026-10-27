@@ -4,7 +4,8 @@
 
 export const environment = {
 	production: false,
-	marketPlaceUrl: 'http://localhost:3000/api',
+	// Backend Express (backend/). Debe terminar en '/'.
+	marketPlaceUrl: 'http://localhost:3000/api/',
 	assets: 'http://localhost:4200/assets/',
 
 	// Payment Provider: 'stripe' | 'paypal'

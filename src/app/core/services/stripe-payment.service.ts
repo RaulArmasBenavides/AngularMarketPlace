@@ -24,35 +24,36 @@ export class StripePaymentService implements IStripePaymentProvider {
     }
   }
 
-  createPaymentIntent(amount: number, orderId: string): Observable<PaymentIntent> {
-    return this.http.post<PaymentIntent>(`${this.apiUrl}/payments/create-intent`, {
-      amount: Math.round(amount * 100),
+  /** El monto lo toma el backend del total guardado en el pedido; `_amount` no se envía. */
+  createPaymentIntent(_amount: number, orderId: string): Observable<PaymentIntent> {
+    return this.http.post<PaymentIntent>(`${this.apiUrl}payments/create-intent`, {
       orderId,
       provider: 'stripe',
     });
   }
 
+  /** Verifica con el backend un PaymentIntent ya confirmado en el cliente. */
   processPayment(paymentIntentId: string, paymentDetails: PaymentDetails): Observable<{ success: boolean; message: string }> {
-    return this.http.post<{ success: boolean; message: string }>(`${this.apiUrl}/payments/process`, {
-      paymentIntentId,
+    return this.http.post<{ success: boolean; message: string }>(`${this.apiUrl}payments/confirm`, {
+      orderId: paymentDetails['orderId'],
       provider: 'stripe',
-      ...paymentDetails,
+      paymentId: paymentIntentId,
     });
   }
 
   getSavedPaymentMethods(): Observable<PaymentMethod[]> {
-    return this.http.get<PaymentMethod[]>(`${this.apiUrl}/payments/methods`);
+    return this.http.get<PaymentMethod[]>(`${this.apiUrl}payments/methods`);
   }
 
   savePaymentMethod(paymentDetails: PaymentDetails): Observable<PaymentMethod> {
-    return this.http.post<PaymentMethod>(`${this.apiUrl}/payments/methods`, {
+    return this.http.post<PaymentMethod>(`${this.apiUrl}payments/methods`, {
       provider: 'stripe',
       ...paymentDetails,
     });
   }
 
   deletePaymentMethod(paymentMethodId: string): Observable<{ success: boolean }> {
-    return this.http.delete<{ success: boolean }>(`${this.apiUrl}/payments/methods/${paymentMethodId}`);
+    return this.http.delete<{ success: boolean }>(`${this.apiUrl}payments/methods/${paymentMethodId}`);
   }
 
   getProviderName(): string {
@@ -77,13 +78,17 @@ export class StripePaymentService implements IStripePaymentProvider {
     return null;
   }
 
-  async confirmCardPayment(clientSecret: string): Promise<{ paymentIntent?: { status: string; client_secret: string } }> {
+  /** Cobra con la tarjeta. Stripe devuelve `error` en vez de lanzar excepción: revisar ambos casos. */
+  async confirmCardPayment(clientSecret: string): Promise<{ paymentIntent?: { id: string; status: string }; error?: { message?: string } }> {
     if (!this.stripe) {
       throw new Error('Stripe not initialized');
     }
+    if (!this.cardElement) {
+      throw new Error('Card element not mounted');
+    }
     return this.stripe.confirmCardPayment(clientSecret, {
       payment_method: {
-        card: this.cardElement!,
+        card: this.cardElement,
       },
     });
   }

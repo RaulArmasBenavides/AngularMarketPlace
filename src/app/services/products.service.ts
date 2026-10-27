@@ -4,7 +4,6 @@ import { Observable, throwError } from 'rxjs';
 import { catchError, shareReplay } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { Product } from '../models/product.model';
-import { MockDataService } from '../core/services/mock-data.service';
 
 @Injectable({
   providedIn: 'root'
@@ -13,46 +12,29 @@ export class ProductsService {
   private readonly api: string = environment.marketPlaceUrl;
   private productsCache$: Observable<Product[]> | null = null;
 
-  constructor(
-    private readonly http: HttpClient,
-    private readonly mockDataService: MockDataService
-  ) {}
+  constructor(private readonly http: HttpClient) {}
 
   getData(): Observable<Product[]> {
-    // ✅ Caché automático - solo 1 request aunque se subscribe múltiples veces
+    // Caché: una sola petición aunque haya varias suscripciones
     if (!this.productsCache$) {
-      // 🎯 Primero intenta mock data (local JSON)
-      // Si no existe, fallback a backend
-      this.productsCache$ = this.mockDataService.getProducts().pipe(
-        catchError((mockError) => {
-          console.log('Mock data not available, trying backend:', mockError.message);
-          // Si mock data no existe, intenta backend
-          return this.http.get<Product[]>(`${this.api}products.json`).pipe(
-            catchError((backendError) => {
-              console.error('Backend unavailable:', backendError.message);
-              return this.handleError(backendError);
-            })
-          );
+      this.productsCache$ = this.http.get<Product[]>(`${this.api}products`).pipe(
+        catchError((error: HttpErrorResponse) => {
+          this.productsCache$ = null; // permitir reintentar
+          return this.handleError(error);
         }),
-        shareReplay(1) // ✅ Cachea la última emisión
+        shareReplay(1)
       );
     }
     return this.productsCache$;
   }
 
-  // ✅ Método para invalidar caché cuando sea necesario
   invalidateCache(): void {
     this.productsCache$ = null;
   }
 
   private handleError(error: HttpErrorResponse): Observable<never> {
-    let errorMessage = 'An error occurred while fetching products';
-    if (error.error instanceof ErrorEvent) {
-      errorMessage = error.error.message;
-    } else {
-      errorMessage = `Error Code: ${error.status}\nMessage: ${error.message}`;
-    }
-    console.error(errorMessage);
-    return throwError(() => new Error(errorMessage));
+    const message = `Error al cargar productos (${error.status || 'sin conexión'})`;
+    console.error(message, error.message);
+    return throwError(() => new Error(message));
   }
 }

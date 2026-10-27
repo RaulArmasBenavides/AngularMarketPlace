@@ -1,24 +1,16 @@
-
-FROM node:19-alpine3.15 as dev-deps
+FROM node:22-alpine AS builder
 WORKDIR /app
-COPY package.json package.json
-RUN npm install --frozen-lockfile
-
-
-FROM node:19-alpine3.15 as builder
-WORKDIR /app
-COPY --from=dev-deps /app/node_modules ./node_modules
+COPY package*.json ./
+RUN npm ci
 COPY . .
-# RUN yarn test
-RUN npm run build
+RUN npm run build -- --configuration production
 
 
-FROM nginx:1.23.3 as prod
+FROM nginx:1.27-alpine AS prod
 EXPOSE 80
 
-COPY --from=builder /app/dist/frontend /usr/share/nginx/html
-#COPY assets/ /usr/share/nginx/html/assets
+COPY --from=builder /app/dist/frontend/browser /usr/share/nginx/html
 RUN rm /etc/nginx/conf.d/default.conf
-COPY nginx/nginx.conf /etc/nginx/conf.d
+COPY nginx/nginx.conf /etc/nginx/conf.d/default.conf
 
-CMD [ "nginx","-g", "daemon off;" ]
+CMD ["nginx", "-g", "daemon off;"]

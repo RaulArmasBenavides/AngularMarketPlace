@@ -31,35 +31,37 @@ export class PaypalPaymentService implements IPaypalPaymentProvider {
     });
   }
 
-  createPaymentIntent(amount: number, orderId: string): Observable<PaymentIntent> {
-    return this.http.post<PaymentIntent>(`${this.apiUrl}/payments/create-intent`, {
-      amount,
+  /** El monto lo toma el backend del total guardado en el pedido; `_amount` no se envía. */
+  createPaymentIntent(_amount: number, orderId: string): Observable<PaymentIntent> {
+    return this.http.post<PaymentIntent>(`${this.apiUrl}payments/create-intent`, {
       orderId,
       provider: 'paypal',
     });
   }
 
-  processPayment(paymentIntentId: string, paymentDetails: PaymentDetails): Observable<{ success: boolean; message: string }> {
-    return this.http.post<{ success: boolean; message: string }>(`${this.apiUrl}/payments/process`, {
-      paymentIntentId,
+  /** Ejecuta el pago aprobado en PayPal y lo verifica en el backend. */
+  processPayment(paymentId: string, paymentDetails: PaymentDetails): Observable<{ success: boolean; message: string }> {
+    return this.http.post<{ success: boolean; message: string }>(`${this.apiUrl}payments/confirm`, {
+      orderId: paymentDetails['orderId'],
       provider: 'paypal',
-      ...paymentDetails,
+      paymentId,
+      payerId: paymentDetails['payerId'],
     });
   }
 
   getSavedPaymentMethods(): Observable<PaymentMethod[]> {
-    return this.http.get<PaymentMethod[]>(`${this.apiUrl}/payments/methods`);
+    return this.http.get<PaymentMethod[]>(`${this.apiUrl}payments/methods`);
   }
 
   savePaymentMethod(paymentDetails: PaymentDetails): Observable<PaymentMethod> {
-    return this.http.post<PaymentMethod>(`${this.apiUrl}/payments/methods`, {
+    return this.http.post<PaymentMethod>(`${this.apiUrl}payments/methods`, {
       provider: 'paypal',
       ...paymentDetails,
     });
   }
 
   deletePaymentMethod(paymentMethodId: string): Observable<{ success: boolean }> {
-    return this.http.delete<{ success: boolean }>(`${this.apiUrl}/payments/methods/${paymentMethodId}`);
+    return this.http.delete<{ success: boolean }>(`${this.apiUrl}payments/methods/${paymentMethodId}`);
   }
 
   getProviderName(): string {

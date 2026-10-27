@@ -36,7 +36,7 @@ describe('ProductsService', () => {
         expect(products).toEqual(mockProducts);
       });
 
-      const req = httpMock.expectOne((request) => request.url.includes('products.json'));
+      const req = httpMock.expectOne((request) => request.url.endsWith('/products'));
       expect(req.request.method).toBe('GET');
       req.flush(mockProducts);
     });
@@ -60,10 +60,10 @@ describe('ProductsService', () => {
         });
 
         // No second HTTP request expected
-        httpMock.expectNone((request) => request.url.includes('products.json'));
+        httpMock.expectNone((request) => request.url.endsWith('/products'));
       });
 
-      const req = httpMock.expectOne((request) => request.url.includes('products.json'));
+      const req = httpMock.expectOne((request) => request.url.endsWith('/products'));
       req.flush(mockProducts);
     });
 
@@ -86,7 +86,7 @@ describe('ProductsService', () => {
         }
       });
 
-      const req = httpMock.expectOne((request) => request.url.includes('products.json'));
+      const req = httpMock.expectOne((request) => request.url.endsWith('/products'));
       req.flush(mockProducts);
     });
 
@@ -99,7 +99,7 @@ describe('ProductsService', () => {
         });
       });
 
-      const req = httpMock.expectOne((request) => request.url.includes('products.json'));
+      const req = httpMock.expectOne((request) => request.url.endsWith('/products'));
       req.flush(mockProducts);
     });
   });
@@ -115,11 +115,11 @@ describe('ProductsService', () => {
           done();
         });
 
-        const req2 = httpMock.expectOne((request) => request.url.includes('products.json'));
+        const req2 = httpMock.expectOne((request) => request.url.endsWith('/products'));
         req2.flush(mockProducts);
       });
 
-      const req1 = httpMock.expectOne((request) => request.url.includes('products.json'));
+      const req1 = httpMock.expectOne((request) => request.url.endsWith('/products'));
       req1.flush(mockProducts);
     });
 
@@ -136,11 +136,11 @@ describe('ProductsService', () => {
           done();
         });
 
-        const req2 = httpMock.expectOne((request) => request.url.includes('products.json'));
+        const req2 = httpMock.expectOne((request) => request.url.endsWith('/products'));
         req2.flush(mockProducts);
       });
 
-      const req1 = httpMock.expectOne((request) => request.url.includes('products.json'));
+      const req1 = httpMock.expectOne((request) => request.url.endsWith('/products'));
       req1.flush(mockProducts);
     });
   });
@@ -155,7 +155,7 @@ describe('ProductsService', () => {
         }
       });
 
-      const req = httpMock.expectOne((request) => request.url.includes('products.json'));
+      const req = httpMock.expectOne((request) => request.url.endsWith('/products'));
       req.error(new ErrorEvent('Network error'));
     });
 
@@ -174,12 +174,12 @@ describe('ProductsService', () => {
             error: () => fail('second request should succeed')
           });
 
-          const req2 = httpMock.expectOne((request) => request.url.includes('products.json'));
+          const req2 = httpMock.expectOne((request) => request.url.endsWith('/products'));
           req2.flush(mockProducts);
         }
       });
 
-      const req1 = httpMock.expectOne((request) => request.url.includes('products.json'));
+      const req1 = httpMock.expectOne((request) => request.url.endsWith('/products'));
       req1.error(new ErrorEvent('Network error'));
     });
   });

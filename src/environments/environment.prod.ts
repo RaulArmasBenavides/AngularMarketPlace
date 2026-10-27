@@ -1,6 +1,7 @@
 export const environment = {
 	production: true,
-	marketPlaceUrl: 'https://api.marketplace.com',
+	// Ruta relativa: nginx reenvía /api/ al contenedor del backend (ver nginx/nginx.conf).
+	marketPlaceUrl: '/api/',
 	assets: 'https://cdn.marketplace.com/assets/',
 
 	// Payment Provider: 'stripe' | 'paypal' (puede ser ENV variable)
